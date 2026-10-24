@@ -114,6 +114,11 @@ const openTasks = () => tasks.filter(t => !done.has(t.id)).sort(byPriority);
 
 // 1) Telegram güncellemeleri
 const updates = await tg('getUpdates', { offset: state.offset, timeout: 0, allowed_updates: ['message', 'callback_query'] });
+if (!updates.ok) {
+  console.error(`Telegram'a bağlanılamadı (${updates.description}). TELEGRAM_BOT_TOKEN secret'ını kontrol edin.`);
+  process.exit(1);
+}
+console.log(`Telegram'dan ${updates.result.length} yeni güncelleme alındı.`);
 for (const u of updates.result || []) {
   state.offset = u.update_id + 1;
   if (u.message) {
