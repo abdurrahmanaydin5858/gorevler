@@ -1,0 +1,46 @@
+name: Hatırlatıcı
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hatirlatici
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          ref: data
+          path: data
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Telegram'ı işle ve hatırlat
+        run: node scripts/notify.mjs
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TASKS_PASSWORD: ${{ secrets.TASKS_PASSWORD }}
+          DATA_DIR: data
+      - name: Durumu kaydet
+        working-directory: data
+        run: |
+          [ -z "$(git status --porcelain)" ] && exit 0
+          git config user.name "hatirlatici"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git commit -qm "Durum güncellendi"
+          for i in 1 2 3; do
+            git pull -q --rebase origin data && git push -q origin HEAD:data && exit 0
+            sleep 3
+          done
+          exit 1

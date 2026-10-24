@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Önceliklerim</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --text:#16181d; --muted:#5f6774; --line:#e2e5ea; --soft:#eef1f4;
+  --accent:#0f766e; --accent-ink:#fff; --danger:#b42318;
+  --p1:#dc2626; --p2:#ea580c; --p3:#ca8a04; --p4:#2563eb; --p5:#64748b;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1115; --card:#171a21; --text:#e8eaee; --muted:#9aa3b2; --line:#2a2f3a; --soft:#20242d;
+    --accent:#2dd4bf; --accent-ink:#06201d; --danger:#f87171;
+    --p1:#f87171; --p2:#fb923c; --p3:#facc15; --p4:#60a5fa; --p5:#94a3b8;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:16px 16px 64px}
+header{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+h1{font-size:22px;margin:0;flex:1}
+h2{font-size:15px;margin:0 0 12px}
+.status{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
+label:first-of-type{margin-top:0}
+input,textarea,select{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{resize:vertical;min-height:70px}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--text);padding:9px 14px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button.ghost{background:transparent;border-color:transparent;padding:6px 8px}
+button.danger{color:var(--danger)}
+button:disabled{opacity:.6;cursor:default}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.seg{display:flex;gap:8px}
+.seg button{flex:1}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.pris{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.pris button{padding:8px 4px;font-size:12px;line-height:1.2;border-left:4px solid var(--pc)}
+.pris button b{display:block;font-size:17px}
+.pris button[aria-pressed=true]{background:var(--pc);color:#fff;border-color:var(--pc)}
+.row{display:flex;gap:10px;align-items:center;margin-top:16px}
+.tabs{display:flex;gap:6px;margin:0 0 12px}
+.tabs button{padding:6px 12px;font-size:13px}
+.tabs button[aria-pressed=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.group{font-size:13px;font-weight:700;color:var(--muted);margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--pc)}
+.task{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--pc);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.task .title{font-weight:600;white-space:pre-wrap;word-break:break-word}
+.task .meta{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.task .note{font-size:13px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.task .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.task .actions select{width:auto;padding:6px 8px;font-size:13px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:8px 10px;margin-top:10px}
+.confirm span{flex:1;min-width:140px;font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:32px 0}
+.err{color:var(--danger);font-size:13px;margin-top:8px}
+.legend{font-size:12px;color:var(--muted);margin-top:8px}
+[hidden]{display:none!important}
+@media (max-width:480px){ .pris button{font-size:11px} }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Önceliklerim</h1>
+    <span class="status" id="status"></span>
+    <button class="ghost" id="btnReload" title="Yenile" aria-label="Yenile">⟳</button>
+    <button class="ghost" id="btnSettings" title="Ayarlar" aria-label="Ayarlar">⚙️</button>
+  </header>
+
+  <section class="card" id="setup" hidden>
+    <h2>Kurulum</h2>
+    <label for="cfgRepo">GitHub repo (kullanıcı/repo)</label>
+    <input id="cfgRepo" placeholder="kullaniciadi/gorevler" autocomplete="off">
+    <label for="cfgToken">GitHub token</label>
+    <input id="cfgToken" type="password" autocomplete="off" placeholder="github_pat_…">
+    <p class="hint">GitHub → Settings → Developer settings → Fine-grained tokens. Yalnızca bu repo, <b>Contents: Read and write</b>.</p>
+    <label for="cfgPass">Görev şifresi</label>
+    <input id="cfgPass" type="password" autocomplete="off">
+    <p class="hint">GitHub'daki <b>TASKS_PASSWORD</b> secret'ı ile aynı olmalı. Görevler bu şifreyle şifrelenip saklanır.</p>
+    <p class="hint">Bu bilgiler yalnızca bu tarayıcıda saklanır.</p>
+    <div class="row"><button class="primary" id="cfgSave">Kaydet ve bağlan</button></div>
+    <div class="err" id="cfgErr"></div>
+  </section>
+
+  <div id="app" hidden>
+    <section class="card">
+      <h2>Yeni görev</h2>
+      <div class="seg" role="group" aria-label="Kategori">
+        <button type="button" data-cat="is" aria-pressed="true">💼 İş</button>
+        <button type="button" data-cat="ev" aria-pressed="false">🏠 Ev</button>
+      </div>
+      <div id="projWrap">
+        <label for="fProject" style="margin-top:12px">Proje</label>
+        <input id="fProject" list="projects" placeholder="ör. GOTS-NEXT" autocomplete="off">
+        <datalist id="projects"></datalist>
+      </div>
+      <label for="fTitle" id="fTitleLbl">İş tanımı</label>
+      <textarea id="fTitle" placeholder="Ne yapılacak?"></textarea>
+      <label for="fNote">Not <span style="font-weight:400;color:var(--muted)">(isteğe bağlı)</span></label>
+      <input id="fNote" placeholder="Kişi, link, detay…" autocomplete="off">
+      <label>Öncelik</label>
+      <div class="pris" id="fPri" role="group" aria-label="Öncelik"></div>
+      <p class="legend" id="priHint"></p>
+      <div class="row">
+        <button class="primary" id="btnAdd">Ekle</button>
+        <span class="err" id="addErr"></span>
+      </div>
+    </section>
+
+    <div class="tabs" role="group" aria-label="Filtre">
+      <button data-f="all" aria-pressed="true">Tümü</button>
+      <button data-f="is" aria-pressed="false">💼 İş</button>
+      <button data-f="ev" aria-pressed="false">🏠 Ev</button>
+    </div>
+    <div id="list"></div>
+  </div>
+</main>
+
+<script>
+// ---------- Öncelikler ----------
+const PRI = {
+  1: { emoji: '🔴', short: 'Her saat',     long: 'Bitene kadar gün içinde saatte bir hatırlatılır.' },
+  2: { emoji: '🟠', short: '3 saatte bir', long: 'Gün içinde 3 saatte bir hatırlatılır.' },
+  3: { emoji: '🟡', short: 'Günde bir',    long: 'Her gün sabah 09:00 civarı hatırlatılır.' },
+  4: { emoji: '🔵', short: '2 günde bir',  long: 'İki günde bir sabah 09:00 civarı hatırlatılır.' },
+  5: { emoji: '⚪', short: 'Haftada bir',  long: 'Haftada bir sabah 09:00 civarı hatırlatılır.' },
+};
+
+// ---------- Zamanlama (scripts/notify.mjs ile aynı olmalı) ----------
+const TZ_OFFSET = 3 * 3600e3;            // Türkiye, UTC+3
+const WINDOW = {                          // mesaj gelebilecek gün (0=Pazar) ve saatler
+  is: { days: [1, 2, 3, 4, 5], start: 8, end: 18 },
+  ev: { days: [0, 1, 2, 3, 4, 5, 6], start: 8, end: 22 },
+};
+const DAILY_HOUR = 9;                    // günlük/haftalık hatırlatma saati
+const HOURS = { 1: 1, 2: 3 };
+const DAYS = { 3: 1, 4: 2, 5: 7 };
+const trHour = ms => new Date(ms + TZ_OFFSET).getUTCHours();
+const trWeekday = ms => new Date(ms + TZ_OFFSET).getUTCDay();
+const trDay = ms => Math.floor((ms + TZ_OFFSET) / 86400e3);
+const dayStart = d => d * 86400e3 - TZ_OFFSET;
+const lastOf = (t, note) => Date.parse(note?.last || t.created);
+const windowOf = t => WINDOW[t.cat] || WINDOW.ev;
+
+function nextDue(t, note, now) {
+  const w = windowOf(t), last = lastOf(t, note);
+  const start = HOURS[t.pri] ? w.start : DAILY_HOUR;
+  let at = HOURS[t.pri]
+    ? last + HOURS[t.pri] * 3600e3
+    : dayStart(trDay(last) + DAYS[t.pri]) + DAILY_HOUR * 3600e3;
+  at = Math.max(at, now);
+  for (let i = 0; i < 8; i++) {           // izinli ilk gün ve saate kaydır
+    const workday = w.days.includes(trWeekday(at)), h = trHour(at);
+    if (workday && h >= start && h < w.end) break;
+    at = workday && h < start ? dayStart(trDay(at)) + start * 3600e3 : dayStart(trDay(at) + 1) + start * 3600e3;
+  }
+  return at;
+}
+
+// ---------- Şifreleme (scripts/notify.mjs ile aynı olmalı) ----------
+const enc = new TextEncoder(), dec = new TextDecoder();
+function b64(u8) { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000)); return btoa(s); }
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const keyCache = new Map();
+async function deriveKey(pass, saltB64) {
+  const k = pass + '|' + saltB64;
+  if (!keyCache.has(k)) {
+    const base = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+    keyCache.set(k, await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: unb64(saltB64), iterations: 250000, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']));
+  }
+  return keyCache.get(k);
+}
+async function encryptJSON(obj, pass, saltB64) {
+  saltB64 = saltB64 || b64(crypto.getRandomValues(new Uint8Array(16)));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(pass, saltB64);
+  const data = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj))));
+  return { v: 1, salt: saltB64, iv: b64(iv), data: b64(data) };
+}
+async function decryptJSON(blob, pass) {
+  const key = await deriveKey(pass, blob.salt);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(blob.iv) }, key, unb64(blob.data));
+  return JSON.parse(dec.decode(plain));
+}
+
+// ---------- Ayarlar ----------
+const CFG_KEY = 'onceliklerim-cfg';
+function guessRepo() {
+  const host = location.hostname;
+  if (!host.endsWith('.github.io')) return '';
+  const owner = host.split('.')[0];
+  const repo = location.pathname.split('/').filter(Boolean)[0];
+  return repo ? `${owner}/${repo}` : `${owner}/${host}`;
+}
+function loadCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY)) || null; } catch { return null; } }
+function saveCfg(c) { try { localStorage.setItem(CFG_KEY, JSON.stringify(c)); } catch {} }
+let cfg = loadCfg();
+
+// ---------- GitHub ----------
+const BRANCH = 'data';
+async function gh(path, opts = {}) {
+  return fetch(`https://api.github.com/repos/${cfg.repo}/${path}`, {
+    cache: 'no-store', ...opts,
+    headers: { Authorization: `Bearer ${cfg.token}`, Accept: 'application/vnd.github+json', ...(opts.headers || {}) },
+  });
+}
+async function readFile(name) {
+  const r = await gh(`contents/${name}?ref=${BRANCH}&t=${Date.now()}`);
+  if (r.status === 404) return null;
+  if (r.status === 401) throw new Error('GitHub token geçersiz.');
+  if (!r.ok) throw new Error(`GitHub hatası (${r.status}).`);
+  const j = await r.json();
+  return { sha: j.sha, text: dec.decode(unb64(j.content.replace(/\n/g, ''))) };
+}
+async function readTasks() {
+  const f = await readFile('tasks.json');
+  if (!f) return { sha: null, salt: null, tasks: [] };
+  const blob = JSON.parse(f.text);
+  try { return { sha: f.sha, salt: blob.salt, tasks: await decryptJSON(blob, cfg.pass) }; }
+  catch { throw new Error('Görev şifresi yanlış.'); }
+}
+// Değişikliği en güncel dosya üzerine uygular; araya başka bir kayıt girdiyse tekrar dener.
+async function mutate(fn, message) {
+  for (let i = 0; i < 3; i++) {
+    const cur = await readTasks();
+    const next = fn(cur.tasks);
+    const blob = await encryptJSON(next, cfg.pass, cur.salt);
+    const body = { message, branch: BRANCH, content: b64(enc.encode(JSON.stringify(blob))) };
+    if (cur.sha) body.sha = cur.sha;
+    const r = await gh('contents/tasks.json', { method: 'PUT', body: JSON.stringify(body) });
+    if (r.ok) return next;
+    if (r.status !== 409 && r.status !== 422) throw new Error(`Kaydedilemedi (${r.status}).`);
+  }
+  throw new Error('Kaydedilemedi, lütfen yenileyin.');
+}
+
+// ---------- Durum ----------
+let tasks = [], state = {}, filter = 'all', cat = 'is', pri = 3, confirming = null, busy = false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const setStatus = s => { $('status').textContent = s; };
+
+async function load() {
+  setStatus('Yükleniyor…');
+  try {
+    const [t, s] = await Promise.all([readTasks(), readFile('state.json')]);
+    state = s ? JSON.parse(s.text) : {};
+    tasks = t.tasks;
+    const done = new Set(state.done || []);
+    if (tasks.some(x => done.has(x.id))) {
+      tasks = await mutate(ts => ts.filter(x => !done.has(x.id)), "Telegram'dan tamamlananlar çıkarıldı");
+    }
+    render();
+    setStatus('Güncel ✓');
+    return true;
+  } catch (e) {
+    setStatus('');
+    showSetup(e.message);
+    return false;
+  }
+}
+
+async function save(fn, message) {
+  if (busy) return;
+  busy = true;
+  tasks = fn(tasks); render();            // önce ekranda göster
+  setStatus('Kaydediliyor…');
+  try { tasks = await mutate(fn, message); render(); setStatus('Kaydedildi ✓'); }
+  catch (e) { alert(e.message); await load(); }
+  finally { busy = false; }
+}
+
+// ---------- Ekran ----------
+function fmtTime(ms, now) {
+  const d = trDay(ms) - trDay(now);
+  const hm = new Date(ms + TZ_OFFSET).toISOString().slice(11, 16);
+  if (d === 0) return `bugün ${hm}`;
+  if (d === 1) return `yarın ${hm}`;
+  return new Date(ms).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', weekday: 'short', timeZone: 'Europe/Istanbul' }) + ' ' + hm;
+}
+const fmtDate = iso => new Date(iso).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', timeZone: 'Europe/Istanbul' });
+
+function render() {
+  const now = Date.now();
+  const projects = [...new Set(tasks.filter(t => t.project).map(t => t.project))].sort((a, b) => a.localeCompare(b, 'tr'));
+  $('projects').innerHTML = projects.map(p => `<option value="${esc(p)}">`).join('');
+
+  for (const b of document.querySelectorAll('.tabs button')) {
+    const f = b.dataset.f;
+    const n = f === 'all' ? tasks.length : tasks.filter(t => t.cat === f).length;
+    b.textContent = { all: 'Tümü', is: '💼 İş', ev: '🏠 Ev' }[f] + ` (${n})`;
+    b.setAttribute('aria-pressed', f === filter);
+  }
+
+  const shown = tasks.filter(t => filter === 'all' || t.cat === filter)
+    .sort((a, b) => a.pri - b.pri || a.created.localeCompare(b.created));
+  if (!shown.length) {
+    $('list').innerHTML = `<div class="empty">${tasks.length ? 'Bu filtrede görev yok.' : '🎉 Açık görev yok.'}</div>`;
+    return;
+  }
+  let html = '', lastPri = 0;
+  for (const t of shown) {
+    if (t.pri !== lastPri) {
+      lastPri = t.pri;
+      html += `<div class="group" style="--pc:var(--p${t.pri})"><span class="dot"></span>Öncelik ${t.pri} · ${PRI[t.pri].short}</div>`;
+    }
+    const opts = [1, 2, 3, 4, 5].map(p => `<option value="${p}"${p === t.pri ? ' selected' : ''}>Öncelik ${p} · ${PRI[p].short}</option>`).join('');
+    html += `<div class="task" style="--pc:var(--p${t.pri})">
+      <div class="title">${esc(t.title)}</div>
+      <div class="meta">
+        <span>${t.cat === 'is' ? '💼 İş' : '🏠 Ev'}${t.project ? ' · 📁 ' + esc(t.project) : ''}</span>
+        <span>Eklendi ${fmtDate(t.created)}</span>
+        <span>🔔 ${fmtTime(nextDue(t, state.notes?.[t.id], now), now)}</span>
+      </div>
+      ${t.note ? `<div class="note">🗒 ${esc(t.note)}</div>` : ''}
+      ${confirming === t.id
+        ? `<div class="confirm"><span>Bu iş yapıldı mı?</span>
+             <button class="primary" data-act="yes" data-id="${t.id}">✅ Evet</button>
+             <button data-act="no" data-id="${t.id}">Hayır</button></div>`
+        : `<div class="actions">
+             <button class="primary" data-act="ask" data-id="${t.id}">Yapıldı mı?</button>
+             <select data-act="pri" data-id="${t.id}" aria-label="Öncelik">${opts}</select>
+             <button class="ghost danger" data-act="del" data-id="${t.id}">Sil</button></div>`}
+    </div>`;
+  }
+  $('list').innerHTML = html;
+}
+
+function renderForm() {
+  for (const b of document.querySelectorAll('.seg button')) b.setAttribute('aria-pressed', b.dataset.cat === cat);
+  $('projWrap').hidden = cat !== 'is';
+  $('fTitleLbl').textContent = cat === 'is' ? 'İş tanımı' : 'Yapılacak';
+  $('fPri').innerHTML = [1, 2, 3, 4, 5].map(p =>
+    `<button type="button" data-p="${p}" aria-pressed="${p === pri}" style="--pc:var(--p${p})"><b>${p}</b>${PRI[p].short}</button>`).join('');
+  $('priHint').textContent = `${PRI[pri].emoji} ${PRI[pri].long} ` +
+    (cat === 'is' ? 'İş bildirimleri hafta içi 08:00–18:00 arası gelir.' : 'Ev bildirimleri her gün 08:00–22:00 arası gelir.');
+}
+
+function showSetup(err = '') {
+  $('setup').hidden = false;
+  $('app').hidden = !cfg;
+  $('cfgRepo').value = cfg?.repo || guessRepo();
+  $('cfgToken').value = cfg?.token || '';
+  $('cfgPass').value = cfg?.pass || '';
+  $('cfgErr').textContent = err;
+}
+
+// ---------- Olaylar ----------
+$('cfgSave').onclick = async () => {
+  const c = { repo: $('cfgRepo').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, ''), token: $('cfgToken').value.trim(), pass: $('cfgPass').value };
+  if (!/^[\w.-]+\/[\w.-]+$/.test(c.repo) || !c.token || !c.pass) { $('cfgErr').textContent = 'Tüm alanları doldurun.'; return; }
+  cfg = c;
+  $('cfgErr').textContent = '';
+  if (await load()) { saveCfg(cfg); $('setup').hidden = true; $('app').hidden = false; }
+};
+$('btnSettings').onclick = () => $('setup').hidden ? showSetup() : ($('setup').hidden = true);
+$('btnReload').onclick = () => cfg && load();
+
+document.querySelector('.seg').onclick = e => { const b = e.target.closest('button'); if (b) { cat = b.dataset.cat; renderForm(); } };
+$('fPri').onclick = e => { const b = e.target.closest('button'); if (b) { pri = +b.dataset.p; renderForm(); } };
+document.querySelector('.tabs').onclick = e => { const b = e.target.closest('button'); if (b) { filter = b.dataset.f; render(); } };
+
+$('btnAdd').onclick = () => {
+  const title = $('fTitle').value.trim(), project = cat === 'is' ? $('fProject').value.trim() : '';
+  if (cat === 'is' && !project) { $('addErr').textContent = 'Proje girin.'; $('fProject').focus(); return; }
+  if (!title) { $('addErr').textContent = cat === 'is' ? 'İş tanımını girin.' : 'Ne yapılacağını yazın.'; $('fTitle').focus(); return; }
+  $('addErr').textContent = '';
+  const id = b64(crypto.getRandomValues(new Uint8Array(6))).replace(/\+/g, '-').replace(/\//g, '_');
+  const task = { id, cat, project, title, note: $('fNote').value.trim(), pri, created: new Date().toISOString() };
+  $('fTitle').value = ''; $('fNote').value = '';
+  save(ts => [...ts, task], `Görev eklendi (öncelik ${pri})`);
+};
+
+$('list').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const id = b.dataset.id, act = b.dataset.act;
+  if (act === 'ask') { confirming = id; render(); }
+  else if (act === 'no') { confirming = null; render(); }
+  else if (act === 'yes') { confirming = null; save(ts => ts.filter(t => t.id !== id), 'Görev tamamlandı'); }
+  else if (act === 'del' && confirm('Bu görev silinsin mi?')) save(ts => ts.filter(t => t.id !== id), 'Görev silindi');
+});
+$('list').addEventListener('change', e => {
+  const s = e.target.closest('select[data-act=pri]');
+  if (!s) return;
+  const id = s.dataset.id, p = +s.value;
+  save(ts => ts.map(t => t.id === id ? { ...t, pri: p } : t), `Öncelik ${p} yapıldı`);
+});
+
+// ---------- Başlat ----------
+renderForm();
+if (cfg) { $('app').hidden = false; load(); } else showSetup();
+</script>
+</body>
+</html>
