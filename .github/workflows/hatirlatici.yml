@@ -2,7 +2,7 @@ name: Hatırlatıcı
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '3-58/5 * * * *'   # saat başı yoğunluğundan kaçmak için 3., 8., 13. … dakikalar
   workflow_dispatch:
 
 permissions:
